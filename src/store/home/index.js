@@ -16,7 +16,7 @@ const actions = {
     async categoryList({commit}){
         let result =await reqCategoryList()
         if (result.code == 200) {
-            commit('CATEGORYLIST',result.data.slice(0,15))
+            commit('CATEGORYLIST',result.data.slice(0,14))
         }
     }
 }
