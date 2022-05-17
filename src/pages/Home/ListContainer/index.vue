@@ -6,18 +6,9 @@
         <!--banner轮播-->
         <div class="swiper-container" id="mySwiper">
           <div class="swiper-wrapper">
-            <div class="swiper-slide">
-              <img src="./images/banner1.jpg" />
+            <div class="swiper-slide" v-for="(carousel,index) in bannerList" :key="carousel.id">
+              <img :src="carousel.imgUrl" />
             </div>
-            <!-- <div class="swiper-slide">
-              <img src="./images/banner2.jpg" />
-            </div>
-            <div class="swiper-slide">
-              <img src="./images/banner3.jpg" />
-            </div>
-            <div class="swiper-slide">
-              <img src="./images/banner4.jpg" />
-            </div> -->
           </div>
           <!-- 如果需要分页器 -->
           <div class="swiper-pagination"></div>
@@ -101,8 +92,39 @@
 </template>
 
 <script>
+import {mapState} from 'vuex'
+import Swiper from 'swiper'
 export default {
   name: "ListContainer",
+  mounted() {
+    this.$store.dispatch('home/getBannerList')
+  },
+  computed:{
+    // 扩展出mapstate对象，以键值对的形式展开
+    ...mapState('home',{bannerList:'bannerList'})
+  },
+  watch:{
+    // 监听轮播图数据的变化
+    bannerList:{
+      handler(newValue,oldValue){
+        this.$nextTick(()=> {
+          var mySwiper = new Swiper(this.$refs.mySwiper,
+          {
+            loop:true,
+            pagination:{
+              el:".swiper-pagination",
+              // 分页器点击
+              clickable:true
+            },
+            navigation:{
+              nextEl:".swiper-button-next",
+              prevEl:".swiper-button-prev",
+            },
+          })
+        })
+      }
+    }
+  }
 };
 </script>
 

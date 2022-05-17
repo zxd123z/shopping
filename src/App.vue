@@ -18,12 +18,12 @@ export default {
     Header,
     Footer
   },
-  methods: {
-    
-  },
+ mounted() {
+  //  优化商品列表请求次数问题，在这执行一次就可以一直用
+    // 通知vuex发请求，获取商品分类的三级列表数据，存在小仓库
+    this.$store.dispatch("home/getCategoryList");
+ },
 }
 </script>
 
-<style>
 
-</style>

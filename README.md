@@ -38,3 +38,15 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 2. path:'/search/:keyword?',
              //params参数占位,?表示可传可不传
 3.nporgress进度条插件
+
+4.mock使用
+    1.mock文件夹里边的json模拟数据不能留空格，会出错
+    2.mock需要的图片放到public文件夹中
+    3.mockServe.js实现模拟数据
+    4.入口文件引入一下
+5.swiper的使用
+    1.引包（在main中引swiper.css,当前文件引js）
+    2.书写页面结构
+    3.new swiper实例
+6.轮播图问题的完美解决
+    watch + $.nexttick 数据监听：监听数据变化

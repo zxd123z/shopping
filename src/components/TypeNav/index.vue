@@ -2,39 +2,61 @@
   <!-- 商品分类导航 -->
   <div class="type-nav">
     <div class="container">
-      <div @mouseleave="leaveIndex(index)">
-         <h2 class="all">全部商品分类</h2>
-           <div class="sort">
-        <div class="all-sort-list2" @click="goSearch">
-          <div class="item" v-for="(c1,index) in categoryList" :key="c1.categoryId" :class="{cur:currentIndex == index}">
-            <!-- 一级分类 -->
-            <h3 @mouseenter="changeIndex(index)" >
-              <a href="">{{c1.categoryName}}</a>
-            </h3>
-            <!-- 二三级分类 -->
-            <div class="item-list clearfix">
+      <div @mouseleave="leaveShow" @mouseenter="enterShow">
+        <h2 class="all">全部商品分类</h2>
+        <transition name="sort">
+          <div class="sort" v-show="show">
+            <div class="all-sort-list2" @click="goSearch">
               <div
-                class="subitem"
-                v-for="(c2,index) in c1.categoryChild"
-                :key="c2.categoryId"
+                class="item"
+                v-for="(c1, index) in categoryList"
+                :key="c1.categoryId"
+                :class="{ cur: currentIndex == index }"
               >
-                <dl class="fore">
-                  <dt>
-                    <a href="">{{c2.categoryName}}</a>
-                  </dt>
-                  <dd>
-                    <em v-for="(c3,index) in c2.categoryChild" :key="c3.categoryId">
-                      <a href="" >{{c3.categoryName}}</a>
-                    </em>
-                  </dd>
-                </dl>
+                <!-- 一级分类 -->
+                <h3 @mouseenter="changeIndex(index)">
+                  <a
+                    :data-categoryName="c1.categoryName"
+                    :data-category1Id="c1.categoryId"
+                    >{{ c1.categoryName }}</a
+                  >
+                </h3>
+                <!-- 二三级分类 -->
+                <div class="item-list clearfix">
+                  <div
+                    class="subitem"
+                    v-for="(c2, index) in c1.categoryChild"
+                    :key="c2.categoryId"
+                  >
+                    <dl class="fore">
+                      <dt>
+                        <a
+                          :data-categoryName="c2.categoryName"
+                          :data-category2Id="c2.categoryId"
+                          >{{ c2.categoryName }}</a
+                        >
+                      </dt>
+                      <dd>
+                        <em
+                          v-for="(c3, index) in c2.categoryChild"
+                          :key="c3.categoryId"
+                        >
+                          <a
+                            :data-categoryName="c3.categoryName"
+                            :data-category3Id="c3.categoryId"
+                            >{{c3.categoryName}}</a
+                          >
+                        </em>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </transition>
       </div>
-      </div>
-     
+
       <nav class="nav">
         <a href="###">服装城</a>
         <a href="###">美妆馆</a>
@@ -45,7 +67,6 @@
         <a href="###">有趣</a>
         <a href="###">秒杀</a>
       </nav>
-    
     </div>
   </div>
 </template>
@@ -53,18 +74,21 @@
 <script>
 import { mapState } from "vuex";
 // 按需加载lodash中的函数
-import throttle from 'lodash/throttle'
+import throttle from "lodash/throttle";
 export default {
   name: "TypeNav",
   data() {
     return {
-      currentIndex:-1, //鼠标滑动导航变色
-    }
+      currentIndex: -1, //鼠标滑动导航变色
+      show: true,
+    };
   },
   //挂载完毕，可以向服务器请求数据
   mounted() {
-    // 通知vuex发请求，获取数据，存在小仓库
-    this.$store.dispatch("home/categoryList");
+    //当组件挂载完毕，让show属性变为false，如果不是home路由组件，将TypeNav进行隐藏
+    if (this.$route.path != "/home") {
+      this.show = false;
+    }
   },
   computed: {
     // 使用命名空间了，这样写
@@ -73,17 +97,50 @@ export default {
   methods: {
     // 鼠标进入就修改导航的背景色
     // throttle实现三级联动节流
-    changeIndex:throttle(function(index){
-       this.currentIndex = index
-    },50),
-    leaveIndex(){
-      this.currentIndex = -1
+    changeIndex: throttle(function (index) {
+      this.currentIndex = index;
+    }, 50),
+    
+    // 利用编程式导航结合事件委派加自定义属性解决三级联动路由跳转
+    goSearch(event) {
+      let element = event.target;
+      // 节点有dataset属性，可以获取节点的自定义属性与属性值
+      let { categoryname, category1id, category2id, category3id } =
+        element.dataset;
+
+      // 如果标签上有categoryname，一定是a标签
+      if (categoryname) {
+        // 声明路由跳转的参数
+        let location = { name: "search" };
+        let query = { categoryName: categoryname };
+        // 判断一二三级分类的a标签
+        if (category1id) {
+          query.category1Id = category1id;
+        } else if (category2id) {
+          query.category2Id = category2id;
+        } else {
+          query.category3Id = category3id;
+        }
+        if (this.$route.params) {
+          location.params = this.$route.params;
+          // 动态整理参数
+          location.query = query;
+          // 路由跳转
+          this.$router.push(location);
+        }
+      }
     },
-    // 利用编程式导航结合事件委派解决三级联动路由跳转
-    goSearch(){
-      
+    // 鼠标进入，展示商品分类列表
+    enterShow() {
+      this.show = true;
     },
-  
+    // 离开展示
+    leaveShow() {
+      this.currentIndex = -1;
+      if (this.$route.path != "/home") {
+        this.show = false;
+      }
+    },
   },
 };
 </script>
@@ -178,9 +235,9 @@ export default {
                   padding: 3px 6px 0 0;
                   font-weight: 700;
                   text-decoration: none;
-                  a{
-                      text-decoration: none;
-                    }
+                  a {
+                    text-decoration: none;
+                  }
                 }
 
                 dd {
@@ -196,7 +253,7 @@ export default {
                     padding: 0 8px;
                     margin-top: 5px;
                     border-left: 1px solid #ccc;
-                    a{
+                    a {
                       text-decoration: none;
                     }
                   }
@@ -211,10 +268,20 @@ export default {
             }
           }
         }
-        .cur{
+        .cur {
           background-color: aquamarine;
         }
       }
+    }
+    // 过度动画样式
+    .sort-enter {
+      height: 0px;
+    }
+    .sort-enter-to {
+      height: 461px;
+    }
+    .sort-enter-active {
+      transition: all 0.5s linear;
     }
   }
 }

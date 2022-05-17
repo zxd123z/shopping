@@ -64,15 +64,13 @@ export default {
     goSearch(){
     // 路由传参，对象形式，还可以用字符串形式和模板字符串
     // push不会替代上一层历史记录replace叠加历史
-      this.$router.push(
-        {
-          name:'search',
-          params:{keyword:this.keyword || undefined},
-          query:{k:this.keyword.toUpperCase()}
+        if (this.$route.query) {
+          let location = {name:"search",params:{keyword:this.keyword || undefined }}
+          location.query = this.$route.query
+          this.$router.push(location)
         }
         // path（路径）和params不可以一起用，name和params才可以,params加undefined解决传参为空。
-      )
-    },
+    }
   },
 }
 </script>
