@@ -9,5 +9,8 @@ import mockRequests from './mockRequest'
 // }
 // 简写 三级联动接口
 export const reqCategoryList = ()=> requests({url:'/product/getBaseCategoryList',method:'get'})
+
 // 获取banner（轮播图接口）
 export const reqBannerList = ()=> mockRequests.get('/banner')
+// 获取floor数据
+export const reqFloorList = ()=> mockRequests.get('/floor')

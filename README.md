@@ -50,3 +50,15 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
     3.new swiper实例
 6.轮播图问题的完美解决
     watch + $.nexttick 数据监听：监听数据变化
+7.floor组件
+    getFloorList这个action在home组件触发，不能在floor组件内部发action，因为需要v-for遍历floor组件
+
+    v-for可以在自定义标签中使用
+8.组件通信：
+    1.props：用于父子组件通信
+    2.自定义事件：$on $emit 可以实现子给父通信
+    3.全局事件总线：$bus 全能
+    4. pubsub-js 全能
+    5.插槽slot 
+    6.vuex 
+
